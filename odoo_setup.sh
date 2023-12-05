@@ -1,8 +1,10 @@
 #!/bin/bash
 ################################################################################
-#Script for installing setup Odoo on Ubuntu 23.04 (could be used for other version too)
-#HELP: Run script on home directory
-#RUN:. odoo_setup.sh
+# Script for installing setup Odoo on Ubuntu 23.04 (could be used for other version too)
+# Author: Trootech
+# Execute the script to setup Odoo:
+# . odoo_setup.sh
+################################################################################
 
 PYTHON_INSTALL="True"
 POSTGRESQL_INSTALL="True"
@@ -11,7 +13,7 @@ WORKSPACE_DIR="$HOME/workspace"
 
 
 echo -e "\n----------Start----------"
-read -p "Enter odoo versions number for setup(Add version number, for multiple use space Ex:15 16):" VNAMES
+read -p "Enter odoo versions number for setup(Add version number, for multiple use space Ex:15 16 17):" VNAMES
 
 if ! [[ $VNAMES =~ (^|[^0-9.])(15|16|17)([^0-9.]|$) ]];then 
     echo "Wrong input for odoo versions !"
@@ -43,6 +45,22 @@ install_anaconda(){
     conda --version
 }
 
+setup_odoo(){
+    echo -e "\n====create==dir for odoo$1"
+    mkdir odoo$1
+    cd $2/odoo$1
+    mkdir -p enterprise odoo projects
+    cd $2/odoo$1/odoo
+    conda create -n env_odoo$1 python=3.10
+    conda activate env_odoo$1
+    git clone https://www.github.com/odoo/odoo --depth 1 --branch $1.0 --single-branch .
+    pip3 install -r requirements.txt
+    pip3 install libsass==0.22.0
+    conda deactivate
+    conda deactivate
+    cd $2
+}
+
 
 if [ $PYTHON_INSTALL = "True" ]; then
     install_python
@@ -63,17 +81,5 @@ cd $WORKSPACE_DIR
 
 for ODOOV in $VNAMES
 do
-    echo -e "\n====create==dir for odoo$ODOOV"
-    mkdir odoo$ODOOV
-    cd $WORKSPACE_DIR/odoo$ODOOV
-    mkdir -p enterprise odoo projects
-    cd $WORKSPACE_DIR/odoo$ODOOV/odoo
-    conda create -n env_odoo$ODOOV python=3.10
-    conda activate env_odoo$ODOOV
-    git clone https://www.github.com/odoo/odoo --depth 1 --branch $ODOOV.0 --single-branch .
-    pip3 install -r requirements.txt
-    pip3 install libsass==0.22.0
-    conda deactivate
-    conda deactivate
-    cd $WORKSPACE_DIR
+    setup_odoo $ODOOV $WORKSPACE_DIR
 done
