@@ -18,38 +18,43 @@ if ! [[ $VNAMES =~ (^|[^0-9.])(15|16|17)([^0-9.]|$) ]];then
     return
 fi
 
+
 sudo apt-get update
 sudo apt-get upgrade -y
 
 
-if [ $PYTHON_INSTALL = "True" ]; then
+install_python(){
     echo -e "\n--- Installing Python 3 + pip3 --"
     sudo apt-get install git python3 python3-pip build-essential wget python3-dev python3-venv python3-wheel libxslt-dev libzip-dev libldap2-dev libsasl2-dev python3-setuptools node-less libpng12-0 libjpeg-dev gdebi -y
-else
-    echo -e "\n----------skipped installing python3----------"
-fi
+}
 
-
-if [ $POSTGRESQL_INSTALL = "True" ]; then
-    echo -e "\n---- Install PostgreSQL Server ----"
+install_postgresql(){
+    echo -e "\n---- Installing PostgreSQL Server ----"
     sudo apt-get install postgresql postgresql-server-dev-all -y
-else
-    echo -e "\n----------skipped installing postgresql----------"
-fi
+}
 
-
-if [ $ANACONDA_INSTALL = "True" ]; then
-    echo -e "\n---- Install PostgreSQL Anaconda ----"
+install_anaconda(){
+    echo -e "\n---- Installing PostgreSQL Anaconda ----"
     sudo apt install curl bzip2 -y
     curl --output anaconda.sh https://repo.anaconda.com/archive/Anaconda3-5.3.1-Linux-x86_64.sh
     sha256sum anaconda.sh
     bash anaconda.sh
     source ~/.bashrc
     conda --version
-else
-    echo -e "\n----------skipped installing anaconda----------"
+}
+
+
+if [ $PYTHON_INSTALL = "True" ]; then
+    install_python
 fi
 
+if [ $POSTGRESQL_INSTALL = "True" ]; then
+    install_postgresql
+fi
+
+if [ $ANACONDA_INSTALL = "True" ]; then
+    install_anaconda
+fi
 
 
 mkdir $WORKSPACE_DIR
